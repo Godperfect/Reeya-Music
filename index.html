@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reeya</title>
+
+    <!-- Internal CSS -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+
+        .player {
+            width: 300px;
+            text-align: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #playlist {
+            list-style-type: none;
+            padding: 0;
+            margin: 20px 0 0;
+        }
+
+        #playlist li {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #playlist li:hover {
+            background-color: #eee;
+        }
+
+        button {
+            margin: 5px;
+            padding: 8px 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="player">
+        <h1>Welcome Hoi </h1>
+
+        <!-- Display current song -->
+        <div id="current-song">
+            <h2 id="song-title">Select a song to play</h2>
+            <audio id="audio-player" controls></audio>
+            <div id="controls">
+                <button onclick="prevSong()">Previous</button>
+                <button onclick="playPause()">Play/Pause</button>
+                <button onclick="nextSong()">Next</button>
+            </div>
+            <button id="download-btn" onclick="downloadSong()">Download</button>
+            <p id="duration">Duration: <span id="time">0:00</span></p>
+        </div>
+
+        <!-- Playlist -->
+        <ul id="playlist"></ul>
+    </div>
+
+    <!-- Internal JavaScript -->
+    <script>
+        // Define an array of songs
+        const songs = [
+            { filename: "./music/reeya.mp3", title: "Will you let me love Reya (English) " },
+            { filename: "music/hehheh.mp3", title: "Dance of the heart Reeya (English) " },
+            { filename: "music/ohh.mp3", title: "Tmilai Maya (Nepali) " }
+        ];
+
+        let currentSongIndex = 0;
+        const audioPlayer = document.getElementById("audio-player");
+        const songTitle = document.getElementById("song-title");
+        const playlist = document.getElementById("playlist");
+        const timeDisplay = document.getElementById("time");
+        const downloadBtn = document.getElementById("download-btn");
+
+        // Initialize playlist
+        function loadPlaylist() {
+            songs.forEach((song, index) => {
+                const li = document.createElement("li");
+                li.textContent = song.title;
+                li.onclick = () => selectSong(index);
+                playlist.appendChild(li);
+            });
+        }
+
+        // Select and play a song
+        function selectSong(index) {
+            currentSongIndex = index;
+            const song = songs[currentSongIndex];
+            audioPlayer.src = song.filename;
+            songTitle.innerText = song.title;
+            downloadBtn.setAttribute("onclick", `downloadSong('${song.filename}')`);
+            audioPlayer.play();
+        }
+
+        // Play or pause the current song
+        function playPause() {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+            } else {
+                audioPlayer.pause();
+            }
+        }
+
+        // Go to the next song
+        function nextSong() {
+            currentSongIndex = (currentSongIndex + 1) % songs.length;
+            selectSong(currentSongIndex);
+        }
+
+        // Go to the previous song
+        function prevSong() {
+            currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+            selectSong(currentSongIndex);
+        }
+
+        // Download the current song
+        function downloadSong(filename) {
+            const link = document.createElement("a");
+            link.href = filename;
+            link.download = filename.split('/').pop();
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Display the current time and duration of the song
+        audioPlayer.addEventListener("timeupdate", () => {
+            const minutes = Math.floor(audioPlayer.currentTime / 60);
+            const seconds = Math.floor(audioPlayer.currentTime % 60).toString().padStart(2, "0");
+            timeDisplay.textContent = `${minutes}:${seconds}`;
+        });
+
+        // Load playlist on startup
+        loadPlaylist();
+    </script>
+
+</body>
+</html>
